@@ -1,0 +1,1276 @@
+; 这个项目 运行流程  
+首先 启动模拟服务器 
+json-server --watch db.json
+然后在文件夹6dome下面打开控制台 
+然后执行命令
+npm run dev 即可 
+简单的vue增删改查就可以了
+
+默认 src文件下空的
+只保留了根目录下的index.html  node_modules package.json package-lock.json    webpack.config.js 
+这些前几个dome配置好的文件
+默认的index.html下面只有一个导入vue到src导入和app入口
+
+开发步骤
+
+1、在src下创建 main.js 
+输入 
+window.alert("holle start")   进行测试 如果代码 正常弹出无报错  删除或者注释  清空现场
+
+2、git base here 
+执行
+npm run  dev  启动空项目
+
+3、main.js导入vue写实例  
+输入
+import Vue from 'vue'
+
+new Vue({
+  components:{},       //  组件  在.vue文件写到所有内容都会替换到这里
+  template:'<App />',   //模板入口 
+}).$mount('#app')   //vue管理入口  
+
+
+4、创建 App.vue 写内容 给Vue实例的组件对象传递 
+输入
+<template></template>
+<script></script>
+<style></style>
+
+5、在App.vue下的template写内容
+输入
+<div id="app">
+<h1> 根组件</h1>
+</div>
+
+6、在main.js导入App.vue 并将到的组件注册到components中
+输入
+import App from './App.vue'
+
+components:{App}
+
+此时：浏览器会显示三个黑色大字  根组件   如果正常显示 继续 如果报错  排错完毕在继续
+
+
+
+
+
+
+7、安装vue-router
+执行 
+ npm i vue-router@2.8     默认这样安装会报错原因是 npm 版本太高了或者依赖冲突
+解决办法npm install npm@6.14.10 -g 也就是降级到npm6
+或者npm i --legacy-peer-deps  测试了不行
+也可以在 package.json文件中找到dependencies中添加 "vue-router": "^3.5.3" 在npm i vue-router
+
+
+8、在index.html导入 vue-router这个第三方包
+输入
+<script src="./node_modules/vue-router/dist/vue-router.js"></script>
+
+
+
+9、webpack.config.js下的externals 增加过滤器 防止vue-router这个第三方包导入后被全部打包到bundle.js内
+输入
+'vue-router':'VueRouter'     vue-router这个第三方插件的导出对象就叫VueRouter
+
+10、在src下创建router.js  导入vue-router这个第三方包
+输入
+import VueRouter from 'vue-router'   
+
+11、在根目录创建components文件夹 在里面创建Foo.vue和Bar.vue
+输入
+Foo.vue内容
+<template>
+<h1>
+Foo  Components </h1>
+</template>
+Bar.vue内容
+<template>
+<h1>
+Bar  Components </h1>
+</template>
+
+12、router.js引入 两个.vue文件 实例化使用
+输入
+; 重点！！！！！！！！！！！！！导入要看当前文件夹和目标文件夹 如果导入路径错误很难搞！！！！
+import Foo from './components/Foo.vue' 
+import Bar from './components/Bar.vue' 
+; 创建路由实例对象  传入对应的局部组件模板和路径 path是自定义路径  component是模板路径
+; 然后导出配置好的实例
+export default new VueRouter({
+routes:[
+    {
+        path:'/foo',
+        component:Foo
+
+    },
+    {
+      path:'/bar',
+      component:Bar
+    }
+]
+})
+
+13、在main.js中导入配置好的router实例对象 并使用
+输入
+import router from './router'
+router:router   //在new Vue 内写
+
+14、在App.vue中给其留一个路由出口
+输入
+<ul>
+    <li><a href="#/foo"> go to foo</a></li>
+    <li><a href="#/bar">go to bar</a></li>
+    <!-- 推荐使用router-link代替a标签 省去了写# -->
+    <li>
+        <router-link to="/bar">router to bar</router-link>
+    </li>
+</ul>
+<!-- 路由出口 -->
+<router-view></router-view>
+
+
+15、如果代码写到一个文件显得太大臃肿vue支持 将文件分开写到多个不同后缀名的文件中 然后在使用src属性进行导入
+输入
+.vue后缀的文件导入其他文件 也需要遵循从当前文件的所在位置开始找目标文件
+<template src="./template.html"></template>
+<script src="./script.js"></script>
+<style src="./style.css"></style>
+
+
+
+VueCLi
+注意：vue作者考虑到新手使用webpack的复杂，所以官方开发了一个工具，vue-cil他可容易帮你快速生成一个已经配置好了的webpack项目，但是这种对学习者不友好
+后期出问题了，不知道啥情况，所以还是建议丛台开始配置
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+实现vue完整版 crud
+
+1、根据当前项目配置情况 开始
+执行
+npm i bootstrap
+
+2、在index.html文件link导入bootstrap.css文件
+输入
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+
+3、如果导入bootstrap.css样式错误那么就是版本太高了 从新卸载了下载低版本即可
+执行
+npm nu bootstrap
+npm i bootstrap@3
+
+
+4、在当前src下的components下创建common文件夹和Aside.vue文件和Navbar.vue文件 和App.vue文件
+并且创建xxx.vue的模板、将对应的.vue代码写进根组件位置
+模板代码 .vue必写的基础代码 后期写的模板代码就是在根组件的位置 
+输入
+  <template>
+<div>
+    <!-- //这个是根组件只能有一个 -->
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+
+    return{}
+  }
+}
+</script>
+<style>
+
+</style>
+
+15、将模板搭配模板代码写进对应的文件
+Navbar.vue 下
+输入
+<template>
+    <!-- //这个是根组件只能有一个 -->
+    <div>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Project name</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Settings</a></li>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Help</a></li>
+        </ul>
+        <form class="navbar-form navbar-right">
+          <input type="text" class="form-control" placeholder="Search...">
+        </form>
+      </div>
+    </div>
+  </nav>
+    </div>
+    </template>
+    <script>
+    
+    export default{
+      data(){
+        return {}
+      }
+    }
+    </script>
+    <style>
+    </style>
+
+Aside.vue下
+输入
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <router-link to="/" exact tag="=li">Home</router-link>
+          <router-link to="/foo" exact tag="=li">foo</router-link>
+          <router-link to="/bar" exact tag="=li">bar</router-link>
+          <router-link to="/crud" exact tag="=li">CRYD</router-link>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item</a></li>
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+          <li><a href="">More navigation</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+        </ul>
+      </div>
+
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+        return {}
+
+  }
+}
+</script>
+<style>
+
+</style>
+
+App.vue文件下
+输入
+<template>
+
+<div id="app">
+//给上面的navbar占位
+<app-navbar></app-navbar>
+<div class="container-fluid">
+<div class="row">
+//给上面的Aside组件占位
+    <app-aside></app-aside>
+    <div class="col-sm-9" col-sm-offset-3 col-md-10 col-md-offset-2 main>
+
+        <!--路由出口-->
+        <router-view></router-view>
+    </div>
+</div>
+</div>
+</div>
+</template>
+<script></script>
+<style></style>
+
+
+16、在App.vue文件下的script中导入Aside和Navbar文件 并设置为子组件
+输入
+
+import AppNavbar from './components/common/Navbar.vue'
+import AppAside from './components/common/Aside.vue'
+    export default{
+  components:{
+    AppNavbar,
+    AppAside
+  }
+    }
+
+    17、在src文件夹下创建assets文件夹在下面创建css文件夹 在创建main.css
+    输入
+/*
+ * Base structure
+ */
+
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+
+body {
+    padding-top: 50px;
+  }
+  
+  
+  
+  /*
+   * Global add-ons
+   */
+  
+  .sub-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  
+  /*
+   * Top navigation
+   * Hide default border to remove 1px line.
+   */
+  
+  .navbar-fixed-top {
+    border: 0;
+  }
+  
+  
+  /*
+   * Sidebar
+   */
+  
+  
+  /* Hide for mobile, show later */
+  
+  .sidebar {
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    .sidebar {
+      position: fixed;
+      top: 51px;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: block;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      /* Scrollable contents if viewport is shorter than content. */
+      background-color: #f5f5f5;
+      border-right: 1px solid #eee;
+    }
+  }
+  
+  
+  /* Sidebar navigation */
+  
+  .nav-sidebar {
+    margin-right: -21px;
+    /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+  }
+  
+  .nav-sidebar>li>a {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+  
+  .nav-sidebar>.active>a,
+  .nav-sidebar>.active>a:hover,
+  .nav-sidebar>.active>a:focus {
+    color: #fff;
+    background-color: #428bca;
+  }
+  
+  
+  
+  /*
+   * Main content
+   */
+  
+  .main {
+    padding: 20px;
+  }
+  
+  @media (min-width: 768px) {
+    .main {
+      padding-right: 40px;
+      padding-left: 40px;
+    }
+  }
+  
+  .main .page-header {
+    margin-top: 0;
+  }
+  
+  
+  
+  /*
+   * Placeholder dashboard ideas
+   */
+  
+  .placeholders {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .placeholders h4 {
+    margin-bottom: 0;
+  }
+  
+  .placeholder {
+    margin-bottom: 20px;
+  }
+  
+  .placeholder img {
+    display: inline-block;
+    border-radius: 50%;
+  }
+  
+
+
+    18、将写好的main .css在main.js中引入 会有热更新
+    输入
+    import './assets/css/main.css'
+    额外的：
+    如果在将main.css文件在index.html中使用link引入也能实现效果但是没有热更新了
+
+    19、配置路由、在components文件夹下面创建crud和home文件夹 用作路由处理文件
+    在home目录下创建
+    Dashboard.vue
+    Home.vue
+    HomeList.vue
+    在crud目录下创建
+    List.vue
+    New.vue
+    Update.vue
+
+20、在创建好的文件内增加模板
+home.vue下
+输入
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+    <h1 class="page-header">Dashboard</h1>
+    <!-- 组件预留占位 -->
+    <dashboard></dashboard>
+    <div class="sub-header">Section title</div>
+    <!-- 组件预留占位 -->
+    <home-list></home-list>
+</div>
+</template>
+<script>
+    // 导入文件获取实例对象  注意要写后缀名 否则会报错
+import Dashboard from './Dashboard.vue'
+import HomeList from './HomeList.vue'
+
+export default{
+    // 将对象注册为组件
+  components:{
+    Dashboard,
+    HomeList
+  },
+  data(){
+    return {}
+  }
+}
+</script>
+<style>
+
+</style>
+
+
+Dashboard.vue下
+输入
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+  <div class="row placeholders">
+          <div class="col-xs-6 col-sm-3 placeholder" >
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200"
+             height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+            <h4>Label</h4>
+            <span class="text-muted">Something else</span>
+          </div>
+          <div class="col-xs-6 col-sm-3 placeholder" >
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200"
+             height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+            <h4>Label</h4>
+            <span class="text-muted">Something else</span>
+          </div>
+          <div class="col-xs-6 col-sm-3 placeholder" >
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200"
+             height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+            <h4>Label</h4>
+            <span class="text-muted">Something else</span>
+          </div>
+          <div class="col-xs-6 col-sm-3 placeholder" >
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200"
+             height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+            <h4>Label</h4>
+            <span class="text-muted">Something else</span>
+          </div>
+        </div>
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+    return {}
+
+  }
+}
+</script>
+<style>
+
+</style>
+
+HomeList.vue下
+输入
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+  <a class="btn btn-success" href="/students/new">添加学生</a>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>爱好</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <a href="#">编辑</a>
+                  <a href="#">删除</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+    return {}
+
+  }
+}
+</script>
+<style>
+
+</style>
+
+
+在crud文件夹下的List.vue内写模板代码
+输入
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+  <router-link class="btn btn-success" to="/crud/new">添加学生</router-link>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>姓名</th>
+                <th>年龄</th>
+                ; <th>性别</th>  这三个是被注释掉的
+                ; <th>爱好</th>
+                ; <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in list" >
+                <td>{{item.id}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.age}}</td>
+                <td>
+                  <a href="#">编辑</a>
+                  <a href="#">删除</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+    return {
+      list:[]
+    }
+
+  }
+}
+</script>
+<style>
+
+</style>
+
+
+在crud目录下New.vue内写模板代码
+输入·
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+       <h2 class="sub-header">添加学生</h2>
+       <!-- 给form注册表单提交事件add -->
+       <form @submit.prevent="add">
+         <div class="form-group">
+           <label for="">姓名</label>
+           <!-- v-model="formData.name"用来收集输入框的数据 -->
+
+           <input type="text"
+            class="form-control"
+             id="" name="name"  v-model="formData.name"
+             required minlength="2" maxlength="10">
+         </div>
+       
+         <div class="form-group">
+           <label for="">年龄</label>
+           <!--      v-model.number="formData.age" 用来收集输入框的数据 -->
+           <input class="form-control"v-model.number="formData.age"
+            type="number" id="" name="age" required min="1" max="150">
+         </div>
+       
+         <button type="submit" class="btn btn-default">Submit</button>
+       </form>
+</div>
+</template>
+<script>
+
+export default{
+  data(){
+    return {}
+
+  }
+}
+</script>
+<style>
+
+</style>
+
+
+
+
+
+21、在router.js下导入home.vue文件和List.vue文件在toutes下设置其路由
+输入
+import Home from './components/home/Home.vue'
+import Home from './components/crud/List.vue'
+; routes下
+ path:"/",
+    component:Home
+ path:"/crud",
+    component:Home
+
+
+    ; 以上是刚刚 做好基础配置 能够简单的使用  下一步开始用ajax请求  但是不在这个项目继续来 这个做备份
+
+
+
+
+    
+22、创建db.json 写入测试数据
+
+先安装json serverInstall JSON Server
+执行
+npm install -g json-server
+创建一个db.json文件
+Create a db.json file with some data
+写入一些数据
+{
+  "list": [
+    { "id": 1, "name": "张三a", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 },
+    { "id": 1, "name": "张三", "age":18 }
+  ],
+  "comments": [
+    { "id": 1, "body": "some comment", "postId": 1 }
+  ]
+}
+运行json-server服务器
+Start JSON Server
+执行
+json-server --watch db.json
+访问网站
+Now if you go to 
+http://localhost:3000/list/1
+你将得到
+you'll get'
+这样的数据
+{
+  "id": 1,
+  "name": "张三a",
+  "age": 18
+}
+
+/*注意：
+json-server 默认开的服务以及在服务端处理了跨域问题
+他会在响应头加一个字段 Access-Control-Allow-Origin
+这个字段的含义就是允许浏览器跨域请求这个资源 所以axios才能跨域访问资源
+*/ 
+
+
+23、下载axios
+执行
+npm i axios
+
+24、在index.html文件中导入axios文件
+<script src="./node_modules/axios/dist/axios.js"></script>
+
+25、配置webpack.config.js下的externals  并重启npm run dev 让webpack生效
+输入
+axios:'axios'
+
+26、在List.vue下引入配置后节流的axios 然后在script中的 默认导出对象中 data下创建声明钩子created并在内部写axios请求
+输入·
+  // 导出axios插件
+  import axios from 'axios'
+
+/* axios是异步请求 这个是异步默认写法
+ 声明钩子
+created(){
+    //  then表示返回后的回调函数 res就行返回的参数 
+    axios.get('http://127.0.0.1:3000/list').then(res=>{
+      // console.log(res)
+      // 当前实例包含data 请求响应后的res也包括data赋值即可
+      this.list=res.data
+    })
+  }
+*/
+//高级方式写法  这个跟上面的效果一样
+// 这行时候es6的写法  新特性 async 和await 会把所有的异步函数当成同步函数使用
+// 也就是加了这两个关键字 的异步函数 ，会在发送请求是停止，等待响应返回后继续执行
+// 而不是传统的发送请求后 执行其他任务 在内部写回调进行传参带回来在执行
+async created(){
+    //  axios是异步请求 这个是新特性 同步的方式操作异步请求 将拿到的数据返回赋值给res
+  const res= await axios.get('http://127.0.0.1:3000/list')
+      // 当前实例包含data 请求响应后的res也包括data赋值即可
+      this.list=res.data
+  }
+}
+
+
+27、配置添加学生的路由 在router.js中写代码
+输入
+导入模块
+import CrudNew from './components/crud/New.vue'
+
+//export default new VueRouter 下的routes内写这个也叫配置路由
+{
+    path:"/crud/new",
+    component:CrudNew
+}
+
+28、在New.vue文件下的template的表单注册事件和绑定数据script创建保存数据对象和处理注册事件
+流程
+    /*
+      1、注册表单提交事件及处理函数
+      2、配置表单验证
+      3、收集表单数据
+      4、提交表单，发起请求，添加学生
+      5、添加成功，跳转回列表页  使用编程式导航来跳转  详情访问vue下的编程式导航
+
+      */ 
+输入
+
+template下
+  <!-- 1、给form注册表单提交事件add   写在form内-->
+        @submit.prevent="add"
+
+      <!--2、"用来收集姓名输入框的数据"  写在input内-->
+  v-model="formData.name"
+
+    <!-- 2、"用来收集年龄输入框的数据"  写在input内-->
+  v-model="formData.age"
+
+<script>下
+  // 导入axios用来发请求
+import axios from 'axios'
+
+export default{
+  data(){
+    return {
+        <!-- 3、"用来保存输入框的数据"   写在return内-->
+      formData:{
+        "name":'',
+        "age":''
+      }
+    }
+  },
+  created(){
+    console.log(this.$router)
+  },
+  methods:{
+    // 给上面注册的add事件 写具体的处理函数
+    add(){
+      
+      // 发送异步请求提交fordata的数据 添加学生到db.json
+      axios.post('http://127.0.0.1:3000/list',this.formData).then(res=>{
+        // 通过编程式导航 有很多跳转方法 如go(n) 到指定链接 back后退 自定义参数  详情去vue搜索编程式导航
+        // this.$router.back()// 后退
+        this.$router.push('/')//去首页  push里面写路由定位符即可
+      })
+    }
+  }
+}
+</script>
+
+29、封装 将上面List.vue内刚在created声明钩子写好的list列表请求封装起来 方便调用 
+
+从默认的created  移到了methods内、封装后的方法名叫loadList  本身的created 没动 只是内部代码变成了调用 
+  //  axios是异步请求 这个是新特性 同步的方式操作异步请求 将拿到的数据返回赋值给res
+  async loadList(){
+  const res= await axios.get('http://127.0.0.1:3000/list')
+      // 当前实例包含data 请求响应后的res也包括data赋值即可
+      this.list=res.data
+},
+; 改变后的样子
+async created(){
+  // 调用封装后的新特性方法
+  this.loadList()
+},
+
+
+
+30、删除功能在List.vue页面  写代码
+步骤
+//   1、绑定注册删除事件处理函数
+// 2、发起请求删除数据  List.vue已经导入了axios 不需要再导入了 如果没有导入 那么就导入
+// 3、根据响应结果处理  也就是调用 封装后的add方法
+    
+    
+第一步在删除的a标签添加这个注册实际
+     @click.prevent="deleteById(item.id)"
+
+第二步在methods下创建一个删除方法，调用axios的delete方法 发送删除对应的id 
+并且在写一个是否删除提示 如果确认 就返回不删除 如果确认就是删除
+deleteById(id){
+  ; 删除提示
+ if(!window.confirm("确认删除吗？"))
+ {
+  return
+ }
+  //  axios删除用delete方法 返回空对象表示删除成功
+  axios.delete(`http://127.0.0.1:3000/list/${id}`).then(res=>{
+    // console.log(res)
+
+第三步调用封装后的列表请求  实现从新渲染列表
+    this.loadList()
+  })
+}
+
+
+31、编辑 将New.vue 的template代码赋值一份到Update.vue中
+输入·
+
+  <template>
+    <!-- //这个是根组件只能有一个 -->
+<div>
+       <h2 class="sub-header">添加学生</h2>
+       <!-- 给form注册表单提交事件update事件 -->
+       <form>
+         <div class="form-group">
+           <label for="">姓名</label>
+           <!-- v-model="formData.name"用来收集输入框的数据 -->
+
+           <input type="text"
+            class="form-control"
+             id="" name="name" 
+             v-model="formData.name"
+             required minlength="2" maxlength="10">
+         </div>
+       
+         <div class="form-group">
+           <label for="">年龄</label>
+           <!--      v-model.number="formData.age" 用来收集输入框的数据 -->
+           <input class="form-control"       
+           v-model.number="formData.age"
+            type="number" id="" name="age" required min="1" max="150">
+         </div>
+       
+         <button type="submit" class="btn btn-default">Submit</button>
+       </form>
+</div>
+</template>
+<script>
+  // 导入axios用来发请求
+import axios from 'axios'
+
+export default{
+  data(){
+    return {
+      formData:{
+        "name":'',
+        "age":''
+      }
+    }
+  },
+
+  methods:{
+
+  }
+}
+</script>
+<style>
+</style>
+
+32、在router.js中添加一份Update.vue的路由
+输入·
+导入文件
+import CrudUpdate from './components/crud/Update.vue'
+创建组件
+,{
+  path:'/crud/update',
+    component:CrudUpdate
+}
+
+
+33、在List.vue中将编辑的a标签删除 添加下面代码代替a标签跳转 并添加新建的路由
+输入·
+注意 to前面的:不能少  中间的``是拼接的意思 ?后面就是传递的参数
+  <router-link :to="`/crud/update?id=${item.id}`">编辑</router-link>
+
+
+34、在update.vue下创建created钩子 查询点击的字符串并拿到查询字符串id参数 
+输入
+  async created(){
+    // console.log(this.$router)//访问到的是路由实例对象
+    console.log(this.$route)//访问到的是路由参数对象 也就是当前点击编辑的数据的对象
+    //查询当前$route对象的id 并解构赋值 
+    const{id}=this.$route.query
+//     // 将拿到的id通过get请求查询对应的数据
+    const res=await axios.get(`http://127.0.0.1:3000/list/${id}`)
+// //将获取到的数据解构赋值到data
+    const {data}=res
+//     // 打印data对象 完美实现获取到了db.json里面的数据
+    console.log(data)
+
+    this.formData=data
+  },
+
+  35、处理update.vue的更新 也就是点击编辑后 跳转页面 并显示对应的字符串  修改完字符串后再点击提交实现更新
+
+第一步 在export default 中data的下面注册钩子组件created获取数据
+输入
+  async created(){
+    // console.log(this.$router)//访问到的是路由实例对象
+    console.log(this.$route)//访问到的是路由参数对象 也就是当前点击编辑的数据的对象
+    //查询当前$route对象的id 并解构赋值 
+    const{id}=this.$route.query
+//     // 将拿到的id通过get请求查询对应的数据
+    const res=await axios.get(`http://127.0.0.1:3000/list/${id}`)
+// //将获取到的数据解构赋值到data
+    const {data}=res
+//     // 打印data对象 完美实现获取到了db.json里面的数据
+    console.log(data)
+
+    this.formData=data
+  },
+第二步   在template中给form表单注册更新事件
+输入
+       <form @submit.prevent="update">
+第三步在methods内写以下内容
+输入
+    // 给上面注册的事件 写具体的处理函数
+   async update(){
+      // console.log(this.formData)
+      /*
+      1、注册表单提交事件及处理函数
+      2、配置表单验证
+      3、收集表单数据
+      4、提交表单，发起请求，添加学生
+      5、添加成功，跳转回列表页  使用编程式导航来跳转
+
+      */ 
+    //  console.log(this.formData)
+     const {id}=this.formData
+      // 发送异步请求提交fordata的数据 更新学生数据到db.json
+      // 注意patch是更新 put是替换 两者都可以实现编辑数据
+    const{data}= await axios.patch(`http://127.0.0.1:3000/list/${id}`,this.formData)
+    {
+      // 打印发挥的数据 如果是空数组就代表成功
+      console.log(data)
+        // this.$router.back()// 后退
+        this.$router.push('/crud')//后退
+      }
+    }
+
+
+36、在router.js文件中export default new VueRouter内routes上 写一句代码实现高亮
+({
+
+输入·
+linkActiveClass:'active',
+
+  知识点 vue 中获取对象用$route   链接导航用$router
+  在vue中Router构造配置中的 linkActiveClass可以实现选中高亮
+
+
+  37、homelist的未实现  和list的功能类似
+
+
+  38、async函数
+
+
+// 知识点
+// 除了ajax能够发生异步请求的  fatch 可以发送异步请求 是html5新出的api原生支持promise  
+// 现在的潮流都async修饰函数用await搭配promise 实现异步请求
+
+
+/*promise 还是不太方便 还需要回调函数 并且要搭配then使用
+
+在新版本的es6中增加了一个函数 async函数
+
+
+作用 async可以修饰函数   被async修饰的函数内可以使用await的方式操作异步请求api
+实现 在同步函数内实现异步请求
+原理是程序继续执行但是被修饰的async函数内的await异步方法暂停 等待响应后继续执行 
+async是用来代替promise的回调地狱的  也就是解决异步嵌套问题
+语法 async function() {  await 异步请求}*/
+
+// 1、callback方式  实现读取三个文件  异步读取但是要求同步执行
+var fs=require('fs')
+fs.readFile('./a.txt','utf8',function(err,data){
+    if(err)
+    {
+        throw err
+    }
+    console.log(data)
+
+    fs.readFile('./b.txt','utf8',function(err,data){
+        if(err)
+        {
+            throw err
+        }
+        console.log(data)
+        fs.readFile('./c.txt','utf8',function(err,data){
+            if(err)
+            {
+                throw err
+            }
+            console.log(data)
+        })
+        
+    })
+    
+})
+
+console.log("------------------------------分割线---------------------------------")
+//2、 promise 的使用方式读取三个文件  异步读取但是要求同步执行
+// 重新封装readFile
+function readFile(...args)
+{
+    return new Promise((resolve,reject)=>{
+        // 读取参数 实际上函数自己调用自己 类似回调
+        // ...args 出现在方法定义中 叫做rest参数
+        // ...args出现在方法调用形参中 叫做数组的展开操作符 也就是跟arguments类似 自动获取形参并装到数组中 能够自动展开
+        //    fs.readFile.apply(null,args,回调函数) 这个和下面得一样 区别是这个是es5的奇淫巧技
+        
+        //这个是es6得官方实现  两者都是自己调用自己 获取自己的形参数组
+        fs.readFile(...args,(err,data)=>{
+            if(err)
+            {
+                return reject(err)
+            }
+            resolve(data)
+        })
+
+    })
+}
+
+
+// 使用封装后的函数  也是要嵌套 但是没有回调地狱了 用.then代替了嵌套 但是还需需要return 返回下一次读取的文件路径
+// 默认读取是二进制的   参数2可以修改字符编码
+readFile('./a.txt','utf8')
+.then(data=>{
+    console.log(data)
+    return readFile('./b.txt','utf8')
+})
+.then(data=>{
+    console.log(data)
+    return  readFile('./c.txt','utf8')
+})
+.then(data=>{
+    console.log(data)
+})
+
+console.log("------------------------------分割线---------------------------------")
+
+// 3、使用的promisfy插件的方式
+// 在node中提供一个工具函数，专门把一些callback形式的api自动包装成promise形式方便使用
+// 路径 node.js 在docs下的utilities下的util.promisfy工具函数 能够自动将callback包装成promise
+
+// 原理
+// function util (func) {
+//     return (...arg) => new Promise((resolve, reject) => {
+//       func(...arg, (err, arg) => {
+//         if (err) reject(err)
+//         else resolve(arg)
+//       })
+//     })
+//   }
+//具体实现
+  const util= require('util')
+// 注意必须写fs.readFile才能读取文件 如果是stat是读取属性 其他的需要传递函数
+// 这里的read也是自定义的函数名
+const read = util.promisify(fs.readFile)
+
+read('./a.txt','utf8')
+.then(data => {
+  // 拿到了正确的数据
+  console.log(data)
+  return read('b.txt','utf8')
+
+}, err => {
+  // 出现了异常
+  console.log("错误")
+})
+
+.then(data => {
+    // 拿到了正确的数据
+    console.log(data)
+    return read('c.txt','utf8')
+  }, err => {
+    // 出现了异常
+    console.log("错误")
+  })
+  .then(data => {
+    // 拿到了正确的数据
+    console.log(data)
+  }, err => {
+    // 出现了异常
+    console.log("错误")
+  })
+  
+// 我重点圈几个注意点
+// const { promisify } = require("util");
+// const readFile = promisify(fs.readFile);
+// 封装一个函数，得到一个函数，得到的函数返回值是一个promise
+//  (async () => {
+//             let data = await readFile('./index2.html');
+//  })();
+// await 必须放到async 函数中，所以写个自调用函数！
+
+
+ 
+ 
+// 4、async 方式
+// async修饰的函数 内才能使用await 并且await修饰的异步操作要支持promise封装后的callback才行 也就是then接收return返回的对象
+// const fs=require("fs")
+const {promisify}= require('util')
+// 注意必须写fs.readFile才能读取文件 如果是stat是读取属性 其他的需要传递函数
+// 这里的read也是自定义的函数名
+const read2 = promisify(fs.readFile)
+
+async function read_data()
+{
+    // async函数中如果遇到await异步操作 则被await修饰的异步操作方法会等待，但是程序本身会继续执行
+    const dataa=await read2('a.txt','utf8')
+    const datab=await read2('b.txt','utf8')
+    const datac=await read2('c.txt','utf8')
+    console.log(dataa,datab,datac)
+
+    // async返回数据默认返回的是封装后的promise  想接受数据需要用到then
+    return [dataa,datab,datac]
+
+}
+// 调用
+read_data() 
+
+var s=read_data()  //这种并不能接收到正确的数据
+console.log(s)//Promise { <pending> } 只能接受这个格式的数据
+
+// 正确的接收async返回的数据
+read_data().then(data=>{
+    // 这个才是正确的接收了数据data 
+console.log(data)
+}
+)
+
+
+//额外的 知识点  凡是函数被async修饰的函数都返回promise  所以可以 不同的async之间await 相互调用
+
+//如 
+async function sb()
+{
+    // 这个不是async返回 所以接收的就是正常的数据 区别是 这是读取的上面的自定义异步函数 属于嵌套调用
+    const data=await read_data()
+    console.log(data+1)
+}
+
+sb()
+
+
+总结：
+前后端混合模式
+ 以前的绝大多数的网址都这样 用php+ajax+html等进行开方
+ 页面跳转的方式
+ 视图的处理
+ 数据的处理
+ 都在服务端完成
+ 前后端很难协作、工程目录以服务端为主导、前端只能写页面打下手
+
+ 前后端分离
+ 服务端只提供接口、对数据进行操作
+ 前端通过请求接口数据，拿到数据库对视图进行处理 也就是所谓的通过接口交互
+ 人员分工更明确了
+ 工程目录也更清晰了
+ 前端的主要发展方向 是web开发工程师、也就是网站上面前台和后台管理都写的人
+
+ 全栈，前后端都会 但是不精通 常用于小公司人少活多
